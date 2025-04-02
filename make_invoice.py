@@ -121,58 +121,65 @@ def load_invoice_variables(filename='invoice_variables.json'):
         print(f"Error: Failed to decode JSON from '{filename}'.")
         return {}
 
-current_date    = datetime.today().strftime("%d/%m/%Y")
-current_year    = datetime.today().year
-current_month   = datetime.today().month
-expiration_date = last_day_of_month()
+def main():
+    current_date    = datetime.today().strftime("%d/%m/%Y")
+    current_year    = datetime.today().year
+    current_month   = datetime.today().month
+    expiration_date = last_day_of_month()
 
-# Calculate the number of business days for the current month
-business_days  = get_business_days_in_month(current_year, current_month)
-invoice_number = get_invoice_number()
+    business_days  = get_business_days_in_month(current_year, current_month)
+    invoice_number = get_invoice_number()
+    
+    # Load invoice variables from JSON file
+    invoice_variables = load_invoice_variables()
 
-# Prompt user for time-off (days)
-try:
-    time_off = int(input("Time-off (days)? "))
-    business_days -= time_off
-    quantidade = business_days * 8  # Assuming 8 hours per business day
-except ValueError:
-    print("Invalid input. Time-off should be an integer.")
-    quantidade = business_days * 8 
+    # Create PDF instance
+    pdf = InvoicePDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    
+    # Prompt user for Holidays (days)
+    try:
+        time_off = int(input("Holidays (days)? "))
+        business_days -= time_off
+        quantidade = business_days * 8  # Assuming 8 hours per business day
+    except ValueError:
+        print("Invalid input. Holidays should be an integer.")
+        quantidade = business_days * 8 
 
-# Load invoice variables from JSON file
-invoice_variables = load_invoice_variables()
-
-# Create PDF instance
-pdf = InvoicePDF()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.add_page()
-
-# Add sections and tables to PDF
-pdf.add_section("INFORMAÇÕES DA FATURA", {
-    "Número da Fatura": invoice_number,
-    "Data de Emissão":  current_date,
-    "Vencimento":       str(expiration_date.strftime("%d/%m/%Y")),
-})
+    
 
 
-if "provider_data" in invoice_variables:
-    pdf.add_section("DADOS DO PRESTADOR DE SERVIÇO", invoice_variables["provider_data"])
 
-if "client_data" in invoice_variables:
-    pdf.add_section("DADOS DO CLIENTE", invoice_variables["client_data"])
+    # Add sections and tables to PDF
+    pdf.add_section("INFORMAÇÕES DA FATURA", {
+        "Número da Fatura": invoice_number,
+        "Data de Emissão":  current_date,
+        "Vencimento":       str(expiration_date.strftime("%d/%m/%Y")),
+    })
 
-if "service_description" in invoice_variables:
-    pdf.add_table(
-        "DESCRIÇÃO DOS SERVIÇOS PRESTADOS", 
-        ["Descrição do Serviço", "Quantidade", "Valor Unitário (EUR)", "Total (EUR)"], 
-        [[invoice_variables["service_description"], str(quantidade), HOURLY_RATE, "0.00"]]
-    )
 
-if "payment_data" in invoice_variables:
-    pdf.add_section("FORMA DE PAGAMENTO", invoice_variables["payment_data"])
+    if "provider_data" in invoice_variables:
+        pdf.add_section("DADOS DO PRESTADOR DE SERVIÇO", invoice_variables["provider_data"])
 
-invoice_filename = f"invoices/invoice_{datetime.today().strftime('%m_%y')}.pdf"
-pdf.output(invoice_filename)
+    if "client_data" in invoice_variables:
+        pdf.add_section("DADOS DO CLIENTE", invoice_variables["client_data"])
 
-print(f"\nInvoice PDF: {invoice_filename}")
-print("Business days current month:", business_days)
+    if "service_description" in invoice_variables:
+        pdf.add_table(
+            "DESCRIÇÃO DOS SERVIÇOS PRESTADOS", 
+            ["Descrição do Serviço", "Quantidade", "Valor Unitário (EUR)", "Total (EUR)"], 
+            [[invoice_variables["service_description"], str(quantidade), HOURLY_RATE, "0.00"]]
+        )
+
+    if "payment_data" in invoice_variables:
+        pdf.add_section("FORMA DE PAGAMENTO", invoice_variables["payment_data"])
+
+    invoice_filename = f"invoices/invoice_{datetime.today().strftime('%m_%y')}.pdf"
+    pdf.output(invoice_filename)
+
+    print(f"\nInvoice PDF: {invoice_filename}")
+    print("Business days current month:", business_days)
+
+if __name__=="__main__":
+    main()
