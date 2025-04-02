@@ -1,14 +1,15 @@
 {
+    "hourly_rate": 0,
     "service_description": "",
     "payment_data": {
-        "Método": "",
+        "Método de Pagamento": "",
         "Banco": "",
         "SWIFT/BIC": "",
         "IBAN": "",
         "Nome do Beneficiário": ""
     },
     "provider_data": {
-        "Razão Social": "",
+        "Razão Social": ".",
         "Endereço": "",
         "E-mail": "",
         "Telefone": "",
