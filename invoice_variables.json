@@ -1,0 +1,24 @@
+{
+    "service_description": "",
+    "payment_data": {
+        "Método": "",
+        "Banco": "",
+        "SWIFT/BIC": "",
+        "IBAN": "",
+        "Nome do Beneficiário": ""
+    },
+    "provider_data": {
+        "Razão Social": "",
+        "Endereço": "",
+        "E-mail": "",
+        "Telefone": "",
+        "Tax ID": ""
+    },
+    "client_data": {
+        "Razão Social": "",
+        "Endereço": "",
+        "E-mail": "",
+        "Telefone": "",
+        "Tax ID": ""
+    }
+}
